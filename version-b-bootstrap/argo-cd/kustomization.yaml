@@ -3,3 +3,6 @@ kind: Kustomization
 namespace: argocd
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+patchesStrategicMerge:
+  - patch-repo-server-helm.yaml
