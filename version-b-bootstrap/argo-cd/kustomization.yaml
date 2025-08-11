@@ -1,8 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: argocd
+
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-patchesStrategicMerge:
-  - patch-repo-server-helm.yaml
+# Patch the repo-server Deployment to use a custom Helm binary
+patches:
+  - path: patch-repo-server-helm.yaml
+    target:
+      kind: Deployment
+      labelSelector: app.kubernetes.io/name=argocd-repo-server
+

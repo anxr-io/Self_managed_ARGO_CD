@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  # target via kustomize 'patches' (labelSelector), name here is ignored but fine to keep
   name: argocd-repo-server
   namespace: argocd
 spec:
@@ -30,3 +31,4 @@ spec:
           volumeMounts:
             - name: custom-tools
               mountPath: /custom-tools
+
