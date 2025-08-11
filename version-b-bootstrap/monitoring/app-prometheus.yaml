@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: kube-prometheus
+    targetRevision: 10.0.0
+    helm:
+      values: |
+        server:
+          extraScrapeConfigs:
+            - job_name: argocd
+              static_configs:
+                - targets:
+                    - argocd-server-metrics.argocd.svc.cluster.local:8083
+                    - argocd-repo-server.argocd.svc.cluster.local:8084
+                    - argocd-notifications-controller-metrics.argocd.svc.cluster.local:9001
+                    - argocd-metrics.argocd.svc.cluster.local:8082
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
