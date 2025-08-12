@@ -117,47 +117,46 @@ make reset          # Tear down & rebuild cluster from scratch (idempotent)
 
 ```text
 .
-├── .github/
-│   ├── ISSUE_TEMPLATE/
+├── .github
+│   ├── ISSUE_TEMPLATE
 │   │   ├── bug_report.md
-│   │   ├── feature_request.md
-│   │   └── config.yml                # (optional)
-│   ├── workflows/
-│   │   └── lint.yml
-│   └── pull_request_template.md
-├── docs/
+│   │   └── feature_request.md
+│   └── workflows
+│       ├── lint.yml
+│       └── pull_request_template.md
+├── docs
+│   ├── screenshots
+│   │   ├── .gitkeep
+│   │   ├── README.md
+│   │   ├── argo1.png
+│   │   ├── argo2.png
+│   │   ├── argo3.png
+│   │   ├── argo4.png
+│   │   ├── argo5.png
+│   │   ├── argo6.png
+│   │   ├── argo7.png
+│   │   ├── argo8.png
+│   │   └── argo9.png
 │   ├── INSTALL.md
 │   ├── USAGE.md
-│   ├── setup-guide.md                # (optional pointer or legacy)
-│   └── screenshots/
-│       ├── README.md                 # (optional)
-│       ├── argo1.png
-│       ├── argo2.png
-│       ├── argo3.png
-│       ├── argo4.png
-│       ├── argo5.png
-│       ├── argo6.png
-│       ├── argo7.png
-│       ├── argo8.png
-│       ├── argo9.png
-│       └── .gitkeep                  # (optional; remove if folder has images)
-├── version-b-bootstrap/
-│   ├── argo-cd/
+│   └── setup-guide.md
+├── version-b-bootstrap
+│   ├── argo-cd
 │   │   ├── app-argocd.yaml
 │   │   ├── kustomization.yaml
 │   │   └── patch-repo-server-helm.yaml
-│   ├── nginx/
-│   │   ├── README.md
+│   ├── echo-server
 │   │   ├── deployment.yaml
-│   │   ├── service.yaml
-│   │   └── nginx-app.yaml
-│   ├── monitoring/
+│   │   ├── echo-app.yaml
+│   │   └── service.yaml
+│   ├── monitoring
 │   │   ├── app-prometheus-crds.yaml
 │   │   └── app-prometheus.yaml
-│   └── echo-server/
+│   └── nginx
+│       ├── README.md
 │       ├── deployment.yaml
-│       ├── service.yaml
-│       └── echo-app.yaml
+│       ├── nginx-app.yaml
+│       └── service.yaml
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
