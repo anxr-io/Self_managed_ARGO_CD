@@ -51,6 +51,7 @@ Prometheus ◀── scrapes Argo CD metrics
 - **Helm 3**
 - **Git**
 - **Make**
+- **UBUNTU (WSL) - Windows friendly**
 
 **Quick checks**
 ```bash
