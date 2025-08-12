@@ -263,7 +263,9 @@ kubectl -n web get deploy nginx -w
 - Makes the platform self-healing: if a manual change drifts from Git, Argo CD will snap back to the desired state.
 
 Pinning the Helm version ensures charts render the same way in dev, staging, and production, avoiding unexpected diffs caused by Helm upgrades.
+
 ✅ **Verification**:
+
 ```bash
 kubectl -n argocd exec deploy/argocd-repo-server -- helm version
 # Expected: v3.14.4
