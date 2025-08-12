@@ -124,15 +124,22 @@ version-b-bootstrap/
 │  ├─ deployment.yaml
 │  ├─ service.yaml
 │  └─ nginx-app.yaml
-└─ monitoring/
-   ├─ app-prometheus-crds.yaml
-   └─ app-prometheus.yaml
+├─ monitoring/
+│  ├─ app-prometheus-crds.yaml
+│  └─ app-prometheus.yaml
+└─ echo-server/
+   ├─ deployment.yaml
+   ├─ service.yaml
+   └─ echo-app.yaml
 docs/
-├─ setup-guide.md
-└─ architecture.png
+├─ INSTALL.md
+├─ USAGE.md
+└─ screenshots/
 README.md
-```
 Makefile
+```
+</details>
+
 ## 🔧 Detailed Setup (Summary)
 1) **Create cluster & install Argo CD**
    - Create Kind cluster `argocd-lab`
