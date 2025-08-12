@@ -34,12 +34,13 @@ Git is the source of truth. Argo CD installs itself (App-of-Apps), deploys sampl
 
 ```text
 GitHub repo
-  └──▶ Argo CD (app-of-apps)
-        ├─ installs Argo CD (self-manage)
-        ├─ deploys nginx demo (ns: web)
-        └─ deploys kube-prometheus (ns: monitoring)
+└── Argo CD (app-of-apps)
+    ├── installs Argo CD (self-manage)
+    ├── deploys nginx demo (ns: web)
+    ├── deploys echo-server (ns: default or custom)
+    └── deploys kube-prometheus (ns: monitoring)
 
-Prometheus ◀── scrapes Argo CD metrics
+Prometheus <--- scrapes Argo CD metrics
 ```
 ```markdown
 **Scrape targets**
