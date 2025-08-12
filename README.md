@@ -163,6 +163,15 @@ make reset          # Tear down & rebuild cluster from scratch (idempotent)
 └── README.md
 ```
 </details>
+## 🔄 How Self-Management Works
+
+This lab uses the **App-of-Apps** pattern where Argo CD manages its own installation manifests.
+
+An Argo CD Application (`version-b-bootstrap/argo-cd/app-argocd.yaml`) points back to this same repo and path where its manifests are stored.
+
+When any change is committed to that path in Git, Argo CD detects it and reconciles its own deployment accordingly.
+
+This means upgrades, config changes, and even Helm binary updates are all driven from Git — making the control plane itself GitOps-managed.
 
 ## 🔧 Detailed Setup (Summary)
 1) **Create cluster & install Argo CD**
@@ -237,6 +246,34 @@ kubectl -n web get deploy nginx -w
   ```bash
   argocd app diff prometheus || true
   kubectl -n argocd describe app prometheus | sed -n '1,160p'
+  ```
+## 📌 How Part 3 is Implemented — Helm Pinning
+
+**Location in repo:**  
+`version-b-bootstrap/argo-cd/kustomize-patch-helm.yaml`
+
+**Implementation:**  
+- An **initContainer** is added to the Argo CD `repo-server` Deployment.  
+- This container downloads and places **Helm v3.14.4** into `/custom-tools/helm` inside the repo-server pod.  
+- The `repo-server`'s `PATH` is updated to use this Helm binary instead of the default.
+
+**Why this matters**:
+- Ensures Argo CD’s control plane is fully GitOps-managed and reproducible.
+- Changes to Argo CD itself go through the same version control, review, and deployment process as applications it manages.
+- Makes the platform self-healing: if a manual change drifts from Git, Argo CD will snap back to the desired state.
+
+Pinning the Helm version ensures charts render the same way in dev, staging, and production, avoiding unexpected diffs caused by Helm upgrades.
+✅ **Verification**:
+```bash
+kubectl -n argocd exec deploy/argocd-repo-server -- helm version
+# Expected: v3.14.4
+```
+```bash
+argocd app get argo-cd-self-manage
+# Look for:
+#  Sync Status: Synced
+#  Health Status: Healthy
+```
 
 ## 🔍 Helm Pin Verification (Part 3)
 
