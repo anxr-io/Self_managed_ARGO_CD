@@ -27,10 +27,6 @@
 
 Git is the source of truth. Argo CD installs itself (App-of-Apps), deploys sample apps, and sets up monitoring. Prometheus scrapes Argo CD metrics.
 
-## 🧭 Architecture
-
-Git is the source of truth. Argo CD installs itself (App-of-Apps), deploys sample apps, and sets up monitoring. Prometheus scrapes Argo CD metrics.
-
 ```text
 GitHub repo
   └──▶ Argo CD (app-of-apps)
@@ -205,3 +201,56 @@ kubectl -n web get deploy nginx -w
   ```bash
   argocd app diff prometheus || true
   kubectl -n argocd describe app prometheus | sed -n '1,160p'
+
+## 🔍 Helm Pin Verification (Part 3)
+
+This lab pins the Helm binary used by the Argo CD **repo-server** to `v3.14.4`.
+
+**Check the version**
+```bash
+kubectl -n argocd exec deploy/argocd-repo-server -- helm version
+# Expected: v3.14.4
+```
+(Optional) See where Helm is coming from
+```bash
+kubectl -n argocd exec deploy/argocd-repo-server -- which helm
+# often /custom-tools/helm
+```
+If you don’t see v3.14.4, wait ~30–60s and retry (the initContainer may still be injecting the binary).
+Still different? Refresh & restart:
+
+```bash
+kubectl -n argocd annotate app argo-cd-self-manage argocd.argoproj.io/refresh=hard --overwrite
+kubectl -n argocd rollout restart deploy/argocd-repo-server
+```
+## 📝 Notes & Gotchas
+
+- Keep the path `version-b-bootstrap/argo-cd` unless you also update the Argo CD Application that points to it.
+- Prometheus may briefly show **OutOfSync** as the operator mutates resources (labels/annotations). That’s normal.
+- If `make prom-ui` fails early, forward to the **pod**:
+  ```bash
+  kubectl -n monitoring get pods | grep prometheus-kube-prometheus-prometheus
+  kubectl -n monitoring port-forward pod/<POD_NAME> 9091:9090
+  ```
+- 🔀 **Forks**
+  - 👉 If you fork this repo, update `repoURL` in [`version-b-bootstrap/argo-cd/app-argocd.yaml`](version-b-bootstrap/argo-cd/app-argocd.yaml) to your fork.
+  - 👉 Example:
+    ```yaml
+    spec:
+      source:
+        repoURL: https://github.com/<your-username>/akuity-takehome.git
+    ```
+- 🧹 **Clean slate anytime**
+  - 👉 Run:
+    ```bash
+    make reset
+    ```
+
+### Paste this for **License**
+```markdown
+## 📄 License
+MIT — see [LICENSE](LICENSE).
+```
+## 📬 Contact
+Maintainer: **Ankur Dwivedi**  
+GitHub: **@anxr-io**
