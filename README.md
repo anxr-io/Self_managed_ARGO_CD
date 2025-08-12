@@ -1,3 +1,8 @@
+# 🚀 Akuity Take-Home — GitOps Lab (Version B)
+![CI](https://img.shields.io/github/actions/workflow/status/anxr-io/akuity-takehome/lint.yml?branch=main&label=CI)
+![License](https://img.shields.io/github/license/anxr-io/akuity-takehome)
+![Stars](https://img.shields.io/github/stars/anxr-io/akuity-takehome?style=social)
+
 ## 📚 Table of Contents
 
 - [✨ Features](#features)
