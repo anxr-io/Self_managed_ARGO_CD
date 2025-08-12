@@ -1,3 +1,7 @@
+# 📦 Installation Guide — Akuity Take-Home (Version B)
+
+This document walks you through setting up the lab locally using **Kind**, then bootstrapping **Argo CD** and sample apps from this repository.
+
 ## 🧰 Prerequisites
 
 - Docker Desktop (or any container runtime)
