@@ -1,54 +1,7 @@
-# 🚀 Akuity Take-Home — GitOps Lab (Version B)
-![CI](https://img.shields.io/github/actions/workflow/status/anxr-io/akuity-takehome/lint.yml?branch=main&label=CI)
-![License](https://img.shields.io/github/license/anxr-io/akuity-takehome)
-![Stars](https://img.shields.io/github/stars/anxr-io/akuity-takehome?style=social)
+# 📦 Installation Guide — Akuity Take-Home (Version B)
 
-## 📚 Table of Contents
+This document walks you through setting up the lab locally using **Kind**, then bootstrapping **Argo CD** and sample apps from this repository.
 
-- [✨ Features](#features)
-- [🧭 Architecture](#architecture)
-- [🧰 Prerequisites](#prerequisites)
-- [⚡ Quick Start](#quick-start)
-- [🛠 Makefile Commands](#makefile-commands)
-- [🗂 Folder Structure](#folder-structure)
-- [🔧 Detailed Setup (Summary)](#detailed-setup-summary)
-- [✅ Verify & UIs](#verify--uis)
-- [🧪 Drift Demos](#drift-demos)
-- [🐞 Troubleshooting](#troubleshooting)
-- [🔍 Helm Pin Verification (Part 3)](#helm-pin-verification-part-3)
-- [📝 Notes & Gotchas](#notes--gotchas)
-- [📄 License](#license)
-- [📬 Contact](#contact)
-
-## ✨ Features
-
-- **Self-managing Argo CD (App-of-Apps)** — Argo CD installs & manages its own manifests from this repo/path.
-- **Git as Source of Truth** — edits in Git auto-sync to the cluster; drift is detected and (optionally) auto-healed.
-- **Monitoring with Prometheus** — Bitnami **kube-prometheus** chart deploys Prometheus and scrapes Argo CD metrics.
-- **Helm pin (Part 3)** — Argo CD repo-server is pinned to **Helm v3.14.4** via an initContainer for deterministic renders.
-- **Makefile UX** — one-command bootstrap (`make bootstrap`) plus handy targets for UIs, status, and drift demos.
-
-## 🧭 Architecture
-
-Git is the source of truth. Argo CD installs itself (App-of-Apps), deploys sample apps, and sets up monitoring. Prometheus scrapes Argo CD metrics.
-
-```text
-GitHub repo
-└── Argo CD (app-of-apps)
-    ├── installs Argo CD (self-manage)
-    ├── deploys nginx demo (ns: web)
-    ├── deploys echo-server (ns: default or custom)
-    └── deploys kube-prometheus (ns: monitoring)
-
-Prometheus <--- scrapes Argo CD metrics
-```
-```markdown
-**Scrape targets**
-- `argocd-server-metrics:8083`
-- `argocd-repo-server:8084`
-- `argocd-notifications-controller-metrics:9001`
-- `argocd-metrics:8082`
-```
 ## 🧰 Prerequisites
 
 - Docker Desktop (or any container runtime)
@@ -57,7 +10,6 @@ Prometheus <--- scrapes Argo CD metrics
 - **Helm 3**
 - **Git**
 - **Make**
-- **UBUNTU (WSL) - Windows friendly**
 
 **Quick checks**
 ```bash
@@ -118,62 +70,29 @@ make reset          # Tear down & rebuild cluster from scratch (idempotent)
 <details><summary><b>Show full tree</b></summary>
 
 ```text
-.
-├── .github
-│   ├── ISSUE_TEMPLATE
-│   │   ├── bug_report.md
-│   │   └── feature_request.md
-│   └── workflows
-│       ├── lint.yml
-│       └── pull_request_template.md
-├── docs
-│   ├── screenshots
-│   │   ├── .gitkeep
-│   │   ├── README.md
-│   │   ├── argo1.png
-│   │   ├── argo2.png
-│   │   ├── argo3.png
-│   │   ├── argo4.png
-│   │   ├── argo5.png
-│   │   ├── argo6.png
-│   │   ├── argo7.png
-│   │   ├── argo8.png
-│   │   └── argo9.png
-│   ├── INSTALL.md
-│   ├── USAGE.md
-│   └── setup-guide.md
-├── version-b-bootstrap
-│   ├── argo-cd
-│   │   ├── app-argocd.yaml
-│   │   ├── kustomization.yaml
-│   │   └── patch-repo-server-helm.yaml
-│   ├── echo-server
-│   │   ├── deployment.yaml
-│   │   ├── echo-app.yaml
-│   │   └── service.yaml
-│   ├── monitoring
-│   │   ├── app-prometheus-crds.yaml
-│   │   └── app-prometheus.yaml
-│   └── nginx
-│       ├── README.md
-│       ├── deployment.yaml
-│       ├── nginx-app.yaml
-│       └── service.yaml
-├── .gitignore
-├── LICENSE
-├── Makefile
-└── README.md
+version-b-bootstrap/
+├─ argo-cd/
+│  ├─ app-argocd.yaml
+│  └─ kustomization.yaml
+├─ nginx/
+│  ├─ deployment.yaml
+│  ├─ service.yaml
+│  └─ nginx-app.yaml
+├─ monitoring/
+│  ├─ app-prometheus-crds.yaml
+│  └─ app-prometheus.yaml
+└─ echo-server/
+   ├─ deployment.yaml
+   ├─ service.yaml
+   └─ echo-app.yaml
+docs/
+├─ INSTALL.md
+├─ USAGE.md
+└─ screenshots/
+README.md
+Makefile
 ```
 </details>
-## 🔄 How Self-Management Works
-
-This lab uses the **App-of-Apps** pattern where Argo CD manages its own installation manifests.
-
-An Argo CD Application (`version-b-bootstrap/argo-cd/app-argocd.yaml`) points back to this same repo and path where its manifests are stored.
-
-When any change is committed to that path in Git, Argo CD detects it and reconciles its own deployment accordingly.
-
-This means upgrades, config changes, and even Helm binary updates are all driven from Git — making the control plane itself GitOps-managed.
 
 ## 🔧 Detailed Setup (Summary)
 1) **Create cluster & install Argo CD**
@@ -248,36 +167,6 @@ kubectl -n web get deploy nginx -w
   ```bash
   argocd app diff prometheus || true
   kubectl -n argocd describe app prometheus | sed -n '1,160p'
-  ```
-## 📌 How Part 3 is Implemented — Helm Pinning
-
-**Location in repo:**  
-`version-b-bootstrap/argo-cd/kustomize-patch-helm.yaml`
-
-**Implementation:**  
-- An **initContainer** is added to the Argo CD `repo-server` Deployment.  
-- This container downloads and places **Helm v3.14.4** into `/custom-tools/helm` inside the repo-server pod.  
-- The `repo-server`'s `PATH` is updated to use this Helm binary instead of the default.
-
-**Why this matters**:
-- Ensures Argo CD’s control plane is fully GitOps-managed and reproducible.
-- Changes to Argo CD itself go through the same version control, review, and deployment process as applications it manages.
-- Makes the platform self-healing: if a manual change drifts from Git, Argo CD will snap back to the desired state.
-
-Pinning the Helm version ensures charts render the same way in dev, staging, and production, avoiding unexpected diffs caused by Helm upgrades.
-
-✅ **Verification**:
-
-```bash
-kubectl -n argocd exec deploy/argocd-repo-server -- helm version
-# Expected: v3.14.4
-```
-```bash
-argocd app get argo-cd-self-manage
-# Look for:
-#  Sync Status: Synced
-#  Health Status: Healthy
-```
 
 ## 🔍 Helm Pin Verification (Part 3)
 
@@ -322,12 +211,26 @@ kubectl -n argocd rollout restart deploy/argocd-repo-server
     ```bash
     make reset
     ```
+## 8) Troubleshooting quick hits
 
-### Paste this for **License**
-```markdown
-## 📄 License
-MIT — see [LICENSE](LICENSE).
+### Prometheus shows OutOfSync but pods are okay
+```bash
+kubectl -n argocd describe app prometheus | sed -n '1,160p'
+# (Optional if you install the CLI)
+argocd app diff prometheus || true
 ```
-## 📬 Contact
-Maintainer: **Ankur Dwivedi**  
-GitHub: **@anxr-io**
+**Prometheus UI forward fails early**  
+```bash
+kubectl -n monitoring get pods | grep prometheus-kube-prometheus-prometheus
+kubectl -n monitoring port-forward pod/<POD_NAME> 9091:9090
+```
+**Wrong kube context**  
+```bash
+kubectl config get-contexts
+kubectl config use-context kind-argocd-lab
+```
+## 9) Clean up (optional)  
+```bash
+make kind-down
+# or full rebuild anytime:
+make reset
